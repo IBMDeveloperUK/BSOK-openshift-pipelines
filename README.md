@@ -26,7 +26,7 @@ In this tutorial you will:
 
 ## Prerequisites
 
-You need an OpenShift 4 cluster in order to complete this tutorial. If you don't have an existing cluster, go to http://try.openshift.com and register for free in order to get an OpenShift 4 cluster up and running on AWS within minutes.
+You need an OpenShift 4 cluster in order to complete this tutorial. If you don't have an existing cluster, go to [Openlabs](https://developer.ibm.com/openlabs/openshift) and register for free in order to get an OpenShift cluster up and running - select `Lab 6: Bring Your Own Application`.
 
 You will also use the Tekton CLI (`tkn`) through out this tutorial. Download the Tekton CLI by following [instructions](https://github.com/tektoncd/cli#installing-tkn) available on the CLI GitHub repository.
 
@@ -428,9 +428,9 @@ Triggers in conjuntion with pipelines enable us to hook our Pipelines to respond
 
 ## Prerequisites
 
-You need an latest OpenShift 4 cluster running on AWS in order to complete this tutorial. If you don't have an existing cluster, go to http://try.openshift.com and register for free in order to get an OpenShift 4 cluster up and running on AWS within minutes.
+You need an latest OpenShift 4 cluster in order to complete this tutorial. If you don't have an existing cluster, go to [Openlabs](https://developer.ibm.com/openlabs/openshift) and register for free in order to get an OpenShift 4 cluster up and running.
 
->***NOTE:*** Running cluster localy [crc](https://github.com/code-ready/crc/releases) won't work, as we need `webhook-url` to be accessable to `github-repos`
+>***NOTE:*** Running a cluster locally [crc](https://github.com/code-ready/crc/releases) won't work, as you will need `webhook-url` to be accessible to `github-repos`
 
 ### Adding Triggers to our Application:
 
