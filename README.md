@@ -343,9 +343,11 @@ Lets start a pipeline to build and deploy backend application using `tkn`:
 $ tkn pipeline start build-and-deploy \
     -w name=shared-workspace,claimName=source-pvc \
     -p deployment-name=vote-api \
-    -p git-url=http://github.com/openshift-pipelines/vote-api.git \
-    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api \
-
+    -p git-url=https://github.com/IBMDeveeloperUK/BSOK-vote-api.git \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api
+```
+resulting in output similar to:
+```
 Pipelinerun started: build-and-deploy-run-z2rz8
 
 In order to track the pipelinerun progress run:
@@ -358,9 +360,11 @@ Similarly, start a pipeline to build and deploy frontend application:
 $ tkn pipeline start build-and-deploy \
     -w name=shared-workspace,claimName=source-pvc \
     -p deployment-name=vote-ui \
-    -p git-url=http://github.com/openshift-pipelines/vote-ui.git \
-    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui \
-
+    -p git-url=http://github.com/IBMDeveloperUK/BSOK-vote-ui.git \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui
+```
+resulting in output similar to:
+```
 Pipelinerun started: build-and-deploy-run-xy7rw
 
 In order to track the pipelinerun progress run:
