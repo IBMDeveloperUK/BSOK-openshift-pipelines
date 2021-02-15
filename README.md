@@ -28,7 +28,7 @@ In this tutorial you will:
 
 You need an OpenShift 4 cluster in order to complete this tutorial. If you don't have an existing cluster, go to [Openlabs](https://developer.ibm.com/openlabs/openshift) and register for free in order to get an OpenShift cluster up and running - select `Lab 6: Bring Your Own Application`.
 
-You will also use the Tekton CLI (`tkn`) through out this tutorial. Download the Tekton CLI by following [instructions](https://github.com/tektoncd/cli#installing-tkn) available on the CLI GitHub repository.
+You will also use the Tekton CLI (`tkn`) through out this tutorial. The Openlabs environment command shell already has `tkn` installed. If you need Tekton elsewhere, download the Tekton CLI by following [instructions](https://github.com/tektoncd/cli#installing-tkn) available on the CLI GitHub repository.
 
 ## Concepts
 
@@ -427,8 +427,6 @@ Whenever there is any change to your repository we need to start pipeline explic
 Triggers in conjuntion with pipelines enable us to hook our Pipelines to respond to external github events (push events, pull requests etc).
 
 ## Prerequisites
-
-You need an latest OpenShift 4 cluster in order to complete this tutorial. If you don't have an existing cluster, go to [Openlabs](https://developer.ibm.com/openlabs/openshift) and register for free in order to get an OpenShift 4 cluster up and running.
 
 >***NOTE:*** Running a cluster locally [crc](https://github.com/code-ready/crc/releases) won't work, as you will need `webhook-url` to be accessible to `github-repos`
 
