@@ -26,9 +26,16 @@ In this tutorial you will:
 
 ## Prerequisites
 
-You need an OpenShift 4 cluster in order to complete this tutorial. If you don't have an existing cluster, go to [Openlabs](https://developer.ibm.com/openlabs/openshift) and register for free in order to get an OpenShift cluster up and running - select ![Lab 6: Bring Your Own Application](/docs/images/Openlabs-BYOL.png).
+You need an OpenShift 4 cluster in order to complete this tutorial. If you don't have an existing cluster, go to [Openlabs](https://developer.ibm.com/openlabs/openshift) and register for free in order to get an OpenShift cluster up and running - select Lab6 
+![Lab 6: Bring Your Own Application](docs/images/Openlabs-BYOL.png)
 
 You will also use the Tekton CLI (`tkn`) through out this tutorial. The Openlabs environment command shell already has `tkn` installed. If you need Tekton elsewhere, download the Tekton CLI by following [instructions](https://github.com/tektoncd/cli#installing-tkn) available on the CLI GitHub repository.
+
+To be able to trigger a pipeline build directly from an application change/commit, you will need a [github](http://github.com) account, and clones of the sample application components 
+[vote-ui](http://github.com/openshift-pipeline/vote-ui) and 
+[vote-api](http://github.com/openshift-pipeline/vote-api)
+
+![vote-app](/docs/images/Openlabs-VoteApp.png)
 
 ## Concepts
 
@@ -56,8 +63,7 @@ vs
 [PipelineRuns](https://github.com/tektoncd/pipeline/blob/master/docs/pipelineruns.md))
 such that steps can be reusable.
 
-Triggers extends the Tekton
-architecture with the following CRDs:
+Triggers extends the Tekton architecture with the following CRDs:
 
 - [`TriggerTemplate`](https://github.com/tektoncd/triggers/blob/master/docs/triggertemplates.md) - Templates resources to be
   created (e.g. Create PipelineResources and PipelineRun that uses them)
@@ -147,13 +153,17 @@ spec:
 
 When a task starts running, it starts a pod and runs each step sequentially in a separate container on the same pod. This task happens to have a single step, but tasks can have multiple steps, and, since they run within the same pod, they have access to the same volumes in order to cache files, access configmaps, secrets, etc. You can specify volume using workspace. It is recommended that Tasks uses at most one writeable Workspace. Workspace can be secret, pvc, config or emptyDir.
 
-Note that only the requirement for a git repository is declared on the task and not a specific git repository to be used. That allows tasks to be reusable for multiple pipelines and purposes. You can find more examples of reusable tasks in the [Tekton Catalog](https://github.com/tektoncd/catalog) and [OpenShift Catalog](https://github.com/openshift/pipelines-catalog) repositories.
+Note that only the requirement for a git repository is declared on the task and not a specific git repository to be used. That allows tasks to be reusable for multiple pipelines and purposes. 
+You can find more examples of reusable tasks in the 
+[Tekton Catalog](https://github.com/tektoncd/catalog) and 
+[OpenShift Catalog](https://github.com/openshift/pipelines-catalog) repositories.
 
 Install the `apply-manifests` and `update-deployment` tasks from the repository using `oc` or `kubectl`, which you will need for creating a pipeline in the next section:
 
 ```bash
 $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/01_apply_manifest_task.yaml
-
+```
+```bash
 $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/02_update_deployment_task.yaml
 ```
 
@@ -161,16 +171,21 @@ You can take a look at the tasks you created using the [Tekton CLI](https://gith
 
 ```
 $ tkn task ls
-
+```
+resulting in output similar to:
+```
 NAME                AGE
 apply-manifests     10 seconds ago
 update-deployment   4 seconds ago
 ```
 
-We will be using `buildah` clusterTasks, which gets installed along with Operator. Operator installs few ClusterTask which you can see.
+We will be using `buildah` clusterTasks, which gets installed along with the Pipeline Operator. The Operator installs a few ClusterTask which you can see.
 
 ```bash
 $ tkn clustertasks ls
+```
+resulting in output similar to:
+```
 NAME                       DESCRIPTION   AGE
 buildah                                  1 day ago
 buildah-v0-14-3                          1 day ago
@@ -273,8 +288,7 @@ This pipeline helps you to build and deploy backend/frontend, by configuring rig
 Pipeline Steps:
 
   1. Clones the source code of the application from a git repository by referring (`git-url` and `git-revision` param)
-  2. Builds the container image of application using the `buildah` clustertask
-  that uses [Buildah](https://buildah.io/) to build the image
+  2. Builds the container image of application using the `buildah` clustertask that uses [Buildah](https://buildah.io/) to build the image
   3. The application image is pushed to an image registry by refering (`image` param)
   4. The new application image is deployed on OpenShift using the `apply-manifests` and `update-deployment` tasks.
 
@@ -312,7 +326,9 @@ Check the list of pipelines you have created using the CLI:
 
 ```
 $ tkn pipeline ls
-
+```
+resulting in output similar to:
+```
 NAME               AGE            LAST RUN   STARTED   DURATION   STATUS
 build-and-deploy   1 minute ago   ---        ---       ---        ---
 ```
@@ -370,10 +386,14 @@ Pipelinerun started: build-and-deploy-run-xy7rw
 In order to track the pipelinerun progress run:
 tkn pipelinerun logs build-and-deploy-run-xy7rw -f -n pipelines-tutorial
 ```
+
 As soon as you start the `build-and-deploy` pipeline, a pipelinerun will be instantiated and pods will be created to execute the tasks that are defined in the pipeline.
 
 ```bash
 $ tkn pipeline list
+```
+resulting in output similar to:
+```
 NAME               AGE             LAST RUN                     STARTED          DURATION   STATUS
 build-and-deploy   6 minutes ago   build-and-deploy-run-xy7rw   36 seconds ago   ---        Running
 ```
@@ -382,6 +402,9 @@ Above we have started `build-and-deploy` pipeline, with relevant pipeline resour
 
 ```bash
 $ tkn pipelinerun ls
+```
+resulting in output similar to:
+```
 NAME                         STARTED         DURATION     STATUS
 build-and-deploy-run-xy7rw   36 seconds ago   ---          Running
 build-and-deploy-run-z2rz8   40 seconds ago   ---          Running
@@ -392,6 +415,9 @@ Check out the logs of the pipelinerun as it runs using the `tkn pipeline logs` c
 
 ```
 $ tkn pipeline logs -f
+```
+resulting in output similar to:
+```
 ? Select pipelinerun:  [Use arrows to move, type to filter]
 > build-and-deploy-run-xy7rw started 36 seconds ago
   build-and-deploy-run-z2rz8 started 40 seconds ago
@@ -401,7 +427,9 @@ After a few minutes, the pipeline should finish successfully.
 
 ```bash
 $ tkn pipelinerun list
-
+```
+resulting in output similar to:
+```
 NAME                         STARTED      DURATION     STATUS
 build-and-deploy-run-xy7rw   1 hour ago   2 minutes    Succeeded
 build-and-deploy-run-z2rz8   1 hour ago   19 minutes   Succeeded
@@ -416,7 +444,6 @@ You can get the route of the application by executing the following command and 
 ```bash
 $ oc get route vote-ui --template='http://{{.spec.host}}'
 ```
-
 
 If you want to re-run the pipeline again, you can use the following short-hand command to rerun the last pipelinerun again that uses the same workspaces, params and service account used in the previous pipeline run:
 
@@ -543,10 +570,10 @@ spec:
 * Run following command to create Triggertemplate.
 
 ```bash
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/03_event_listener.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/03_triggers/04_event_listener.yaml
 ```
 
->***Note***: EventListener will setup a Service. We need to expose that Service as an OpenShift Route to make it publicly accessible.
+***Note***: EventListener will setup a Service. We need to expose that Service as an OpenShift Route to make it publicly accessible.
 
 * Run below command to expose eventlistener service as a route
 
@@ -562,19 +589,23 @@ Now we need to configure webhook-url on the cloned [backend](https://github.com/
 ```bash
 $ echo "URL: $(oc  get route el-vote-app --template='http://{{.spec.host}}')"
 ```
+resulting in output similar to:
+```
+URL: http://el-vote-app-pipelines-tutorial.dte-ocp44-new-bfay8r-915b3b336cabec458a7c7ec2aa7c625f-0000.us-east.containers.appdomain.cloud
+```
 
->***Note:***
->
->Fork the [backend](https://github.com/IBMDeveloperUK/BSOK-vote-api) and [frontend](https://github.com/IBMDeveloperUK/BSOK-vote-ui) source code repositories so that you have sufficient privileges to configure GitHub webhooks.
+***Note:***
+
+Fork or clone the [backend](https://github.com/IBMDeveloperUK/BSOK-vote-api) and [frontend](https://github.com/IBMDeveloperUK/BSOK-vote-ui) source code repositories so that you have sufficient privileges to configure GitHub webhooks.
 
 ### Configure webhook manually
 
 Open both your forked github repositories (Go to Settings > Webhook)
-click on `Add Webhook` > Add
-```bash
-$ echo "$(oc  get route el-vote-app --template='http://{{.spec.host}}')"
-```
-to payload URL > Select Content type as `application/json` > Add secret eg: `1234567` > Click on `Add Webhook`
+click on `Add Webhook` 
+> Add the above URL to payload URL 
+> Select Content type as `application/json` 
+> Add secret eg: `1234567` 
+> Click on `Add Webhook`
 
 ![Add webhook](docs/images/add-webhook.png)
 
