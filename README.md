@@ -26,20 +26,21 @@ In this tutorial you will:
 
 ## Prerequisites
 
-You need an OpenShift 4 cluster in order to complete this tutorial. If you don't have an existing cluster, go to [Openlabs](https://developer.ibm.com/openlabs/openshift) and register for free in order to get an OpenShift cluster up and running - select Lab6 
-![Lab 6: Bring Your Own Application](docs/images/Openlabs-BYOL.png)
+You need an OpenShift 4 cluster in order to complete this tutorial. If you don't have an existing cluster, go to [Openlabs](https://developer.ibm.com/openlabs/openshift) and register free with [IBM Cloud](https://cloud.ibm.com) in order to get an OpenShift cluster up and running - select Lab6 to get access to Openshift console, and a command shell.
+
+<img alt="Lab 6: Bring Your Own Application" src="/docs/images/Openlabs-BYOL.png" width=150>
 
 You will also use the Tekton CLI (`tkn`) through out this tutorial. The Openlabs environment command shell already has `tkn` installed. If you need Tekton elsewhere, download the Tekton CLI by following [instructions](https://github.com/tektoncd/cli#installing-tkn) available on the CLI GitHub repository.
 
-To be able to trigger a pipeline build directly from an application change/commit, you will need a [github](http://github.com) account, and clones of the sample application components 
-[vote-ui](http://github.com/openshift-pipeline/vote-ui) and 
-[vote-api](http://github.com/openshift-pipeline/vote-api)
+To be able to trigger a pipeline build directly from an application change/commit, you will need a [GitHub](http://github.com) account, and clones of the sample application components 
+[vote-ui](http://github.com/IBMDeveloperUK/BSOK-vote-ui) and 
+[vote-api](http://github.com/IBMDeveloperUK/BSOK-vote-api)
 
 ![vote-app](/docs/images/Openlabs-VoteApp.png)
 
 ## Concepts
 
-Tekton defines a number of [Kubernetes custom resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/) as building blocks in order to standardize pipeline concepts and provide a terminology that is consistent across CI/CD solutions. These custom resources are an extension of the Kubernetes API that let users create and interact with these objects using `kubectl` and other Kubernetes tools.
+Tekton defines a number of [Kubernetes custom resources (CRDs)](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/) as building blocks in order to standardize pipeline concepts and provide a terminology that is consistent across CI/CD solutions. These custom resources are an extension of the Kubernetes API that let users create and interact with these objects using `kubectl` and other Kubernetes tools.
 
 The custom resources needed to define a pipeline are listed below:
 * `Task`: a reusable, loosely coupled number of steps that perform a specific task (e.g. building a container image)
@@ -49,7 +50,8 @@ The custom resources needed to define a pipeline are listed below:
 
 ![Tekton Architecture](docs/images/tekton-architecture.svg)
 
-In short, in order to create a pipeline, one does the following:
+To create a pipeline:
+
 * Create custom or install [existing](https://github.com/tektoncd/catalog) reusable `Tasks`
 * Create a `Pipeline` and `PipelineResources` to define your application's delivery pipeline
 * Create a `PersistentVolumeClaim` to provide the volume/filesystem for pipeline execution
@@ -95,7 +97,7 @@ OpenShift Pipelines is provided as an add-on on top of OpenShift that can be ins
 
 ## Deploy Sample Application
 
-Create a project for the sample application that you will be using in this tutorial:
+Create a project for the sample voting application that you will be using in this tutorial:
 
 ```bash
 $ oc new-project pipelines-tutorial
@@ -110,9 +112,12 @@ Run the following command to see the `pipeline` service account:
 $ oc get serviceaccount pipeline
 ```
 
-You will use the simple application during this tutorial, which has a [frontend](https://github.com/openshift-pipelines/vote-ui) and [backend](https://github.com/openshift-pipelines/vote-api)
+You will use the simple application during this tutorial, which has a [frontend vote-ui](http://github.com/IBMDeveloperUK/BSOK-vote-ui) and 
+[backend vote-api](http://github.com/IBMDeveloperUK/BSOK-vote-api)
 
-You can also deploy the same applications by applying the artifacts available in k8s directory of the respective repo
+**Using your Github account, create clones of these repositories at github.com, to allow you to control the trigger-based build and deploy**
+
+You can also deploy the same applications by applying the artifacts available in k8s directory of the respective repo.
 
 If you deploy the application directly, you should be able to see the deployment in the OpenShift Web Console by switching over to the **Developer** perspective of the OpenShift Web Console. Change from **Administrator** to **Developer** from the drop down as shown below:
 
@@ -121,12 +126,6 @@ If you deploy the application directly, you should be able to see the deployment
 Make sure you are on the `pipelines-tutorial` project by selecting it from the **Project** dropdown menu. Either search for `pipelines-tutorial` in the search bar or scroll down until you find `pipelines-tutorial` and click on the name of your project.
 
 ![Projects](docs/images/projects.png)
-
-<!--
-On the **Topology** view of the **Developer** perspective, you will be able to see the resources you just created.
-
-![Projects](docs/images/application-deployed.png)
--->
 
 ## Install Tasks
 
@@ -279,31 +278,32 @@ spec:
     runAfter:
     - apply-manifests
 ```
-Once you deploy the pipelines, you should be able to visualize pipeline flow  in the OpenShift Web Console by switching over to the **Developer** perspective of the OpenShift Web Console. select pipeline tab, select project as `pipelines-tutorial` and click on pipeline `build-and-deploy`
+Once you deploy the pipelines, you should be able to visualize pipeline flow  in the OpenShift Web Console by switching over to the **Developer** perspective of the OpenShift Web Console. Select pipeline tab, select project as `pipelines-tutorial` and click on pipeline `build-and-deploy`
 
 ![Pipeline-view](docs/images/pipeline-view.png)
 
-This pipeline helps you to build and deploy backend/frontend, by configuring right resources to pipeline.
+This pipeline helps you to build and deploy backend/frontend code, by configuring the appropriate resources to pipeline.
 
 Pipeline Steps:
 
-  1. Clones the source code of the application from a git repository by referring (`git-url` and `git-revision` param)
-  2. Builds the container image of application using the `buildah` clustertask that uses [Buildah](https://buildah.io/) to build the image
-  3. The application image is pushed to an image registry by refering (`image` param)
-  4. The new application image is deployed on OpenShift using the `apply-manifests` and `update-deployment` tasks.
+ 1. Clones the source code of the application from a git repository by referring (`git-url` and `git-revision` param)
+ 1. Builds the container image of application using the `buildah` clustertask that uses [Buildah](https://buildah.io/) to build the image
+ 1. The application image is pushed to an image registry by refering (`image` param)
+ 1. The new application image is deployed on OpenShift using the `apply-manifests` and `update-deployment` tasks.
 
-You might have noticed that there are no references to the git
-repository or the image registry it will be pushed to in pipeline. That's because pipeline in Tekton
+You might have noticed that in the pipeline, there are no references to the specific git
+repository or the image registry it will be pushed to; that's because pipelines in Tekton
 are designed to be generic and re-usable across environments and stages through
 the application's lifecycle. Pipelines abstract away the specifics of the git
 source repository and image to be produced as `PipelineResources` or `Params`. When triggering a
 pipeline, you can provide different git repositories and image registries to be
-used during pipeline execution. Be patient! You will do that in a little bit in
-the next section.
+used during pipeline execution. 
+
+Be patient! You will do that in a little bit in the next section.
 
 The execution order of task is determined by dependencies that are defined between the tasks via inputs and outputs as well as explicit orders that are defined via `runAfter`.
 
-`workspaces` field allow you to specify one or more volumes that each Task in the Pipeline requires during execution. You specify one or more Workspaces in the `workspaces` field.
+The `workspaces` field allow you to specify one or more volumes that each Task in the Pipeline requires during execution. You specify one or more Workspaces in the `workspaces` field.
 
 Create the pipeline by running the following:
 
@@ -316,11 +316,9 @@ Alternatively, in the OpenShift Web Console, you can click on the **+** at the t
 ![OpenShift Console - Import Yaml](docs/images/console-import-yaml.png)
 
 Upon creating the pipeline via the web console, you will be taken to a **Pipeline Details** page that gives an overview of the pipeline you created.
-<!-- >
 
 ![OpenShift Console - Pipeline Details](docs/images/pipeline-details.png)
 
--->
 
 Check the list of pipelines you have created using the CLI:
 
@@ -335,8 +333,7 @@ build-and-deploy   1 minute ago   ---        ---       ---        ---
 
 ## Trigger Pipeline
 
-Now that the pipeline is created, you can trigger it to execute the tasks
-specified in the pipeline.
+Now that the pipeline is created, you can trigger it to execute the tasks specified in the pipeline.
 
 > **Note** :-
 >
@@ -353,13 +350,13 @@ $ oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/ma
 
 A `PipelineRun` is how you can start a pipeline and tie it to the persistentVolumeClaim and params that should be used for this specific invocation.
 
-Lets start a pipeline to build and deploy backend application using `tkn`:
+Let's start a pipeline to build and deploy backend application using `tkn`; copy, edit and run the following command:
 
 ```bash
 $ tkn pipeline start build-and-deploy \
     -w name=shared-workspace,claimName=source-pvc \
     -p deployment-name=vote-api \
-    -p git-url=https://github.com/IBMDeveeloperUK/BSOK-vote-api.git \
+    -p git-url=https://github.com/<!your-github-account!>/BSOK-vote-api.git \
     -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api
 ```
 resulting in output similar to:
@@ -370,13 +367,13 @@ In order to track the pipelinerun progress run:
 tkn pipelinerun logs build-and-deploy-run-z2rz8 -f -n pipelines-tutorial
 ```
 
-Similarly, start a pipeline to build and deploy frontend application:
+Similarly, start a pipeline to build and deploy frontend application; again - copy, edit and run the following command:
 
 ```bash
 $ tkn pipeline start build-and-deploy \
     -w name=shared-workspace,claimName=source-pvc \
     -p deployment-name=vote-ui \
-    -p git-url=http://github.com/IBMDeveloperUK/BSOK-vote-ui.git \
+    -p git-url=http://github.com/<!your-github-account!>/BSOK-vote-ui.git \
     -p IMAGE=image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-ui
 ```
 resulting in output similar to:
@@ -594,18 +591,19 @@ resulting in output similar to:
 URL: http://el-vote-app-pipelines-tutorial.dte-ocp44-new-bfay8r-915b3b336cabec458a7c7ec2aa7c625f-0000.us-east.containers.appdomain.cloud
 ```
 
-***Note:***
+***Reminder:***
 
 Fork or clone the [backend](https://github.com/IBMDeveloperUK/BSOK-vote-api) and [frontend](https://github.com/IBMDeveloperUK/BSOK-vote-ui) source code repositories so that you have sufficient privileges to configure GitHub webhooks.
 
 ### Configure webhook manually
 
-Open both your forked github repositories (Go to Settings > Webhook)
-click on `Add Webhook` 
-> Add the above URL to payload URL 
-> Select Content type as `application/json` 
-> Add secret eg: `1234567` 
-> Click on `Add Webhook`
+Open both your cloned/forkedGitHub repositories and perform the following steps:
+ 1. Go to Settings > Webhook
+ 1. click on `Add Webhook` 
+ 1. Add the above URL to payload URL 
+ 1. Select Content type as `application/json` 
+ 1. Add secret eg: `1234567` 
+ 1. Click on `Add Webhook`
 
 ![Add webhook](docs/images/add-webhook.png)
 
@@ -627,19 +625,21 @@ When we perform any push event on the [backend](https://github.com/IBMDeveloperU
 3. TriggerBinding will extract parameters needed for rendering the TriggerTemplate.
 Successful rendering of TriggerTemplate should create 2 PipelineResources (source-repo-vote-api and image-source-vote-api) and a PipelineRun (build-deploy-vote-api)
 
-We can test this by pushing a commit to vote-api repository from GitHub web ui or from terminal.
+We can test this by pushing a commit to your cloned/forked vote-api repository from GitHub web ui or from terminal.
 
 Let’s push an empty commit to vote-api repository.
 ```bash
 $ git commit -m "empty-commit" --allow-empty && git push origin master
+```
+resulting in output similar to:
+```
 ...
 Writing objects: 100% (1/1), 190 bytes | 190.00 KiB/s, done.
 Total 1 (delta 0), reused 0 (delta 0)
-To github.com:<github-username>/vote-api.git
+To github.com:<!your-github-account!>/vote-api.git
    72c14bb..97d3115  master -> master
 ```
 
 Watch OpenShift WebConsole Developer perspective and a PipelineRun will be automatically created.
 
-![pipeline-run-api](docs/images/pipeline-run-api.png
-)
+![pipeline-run-api](docs/images/pipeline-run-api.png)
