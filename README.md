@@ -91,9 +91,31 @@ In the following sections, you will go through each of the above steps to define
 
 ## Install OpenShift Pipelines
 
-OpenShift Pipelines is provided as an add-on on top of OpenShift that can be installed via an operator available in the OpenShift OperatorHub. Follow [these instructions](install-operator.md) in order to install OpenShift Pipelines on OpenShift via the OperatorHub.
+OpenShift Pipelines is provided as an add-on on top of OpenShift that can be installed via an operator available in the OpenShift OperatorHub. 
+
+ + **Follow [these instructions](install-operator.md) in order to install OpenShift Pipelines on OpenShift via the OperatorHub.**
 
 ![OpenShift OperatorHub](docs/images/operatorhub.png)
+
+```bash
+$ oc get pipeline
+```
+should produce output similar to:
+```
+NAME                         AGE
+buildah                      54m
+buildah-deployment           54m
+buildah-deployment-pr        54m
+buildah-knative              54m
+buildah-knative-pr           54m
+buildah-pr                   54m
+s2i-dotnet-3                 54m
+s2i-dotnet-3-deployment      54m
+s2i-dotnet-3-deployment-pr   54m
+s2i-dotnet-3-knative         54m
+s2i-dotnet-3-knative-pr      54m
+...
+```
 
 ## Deploy Sample Application
 
