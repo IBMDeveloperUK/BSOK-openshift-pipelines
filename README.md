@@ -98,22 +98,24 @@ OpenShift Pipelines is provided as an add-on on top of OpenShift that can be ins
 ![OpenShift OperatorHub](docs/images/operatorhub.png)
 
 ```bash
-$ oc get pipeline
+$ oc get pipeline --all-namespaces
 ```
 should produce output similar to:
 ```
-NAME                         AGE
-buildah                      54m
-buildah-deployment           54m
-buildah-deployment-pr        54m
-buildah-knative              54m
-buildah-knative-pr           54m
-buildah-pr                   54m
-s2i-dotnet-3                 54m
-s2i-dotnet-3-deployment      54m
-s2i-dotnet-3-deployment-pr   54m
-s2i-dotnet-3-knative         54m
-s2i-dotnet-3-knative-pr      54m
+NAMESPACE   NAME                         AGE
+openshift   buildah                      105s
+openshift   buildah-deployment           105s
+openshift   buildah-deployment-pr        105s
+openshift   buildah-knative              105s
+openshift   buildah-knative-pr           105s
+openshift   buildah-pr                   105s
+openshift   s2i-dotnet-3                 106s
+openshift   s2i-dotnet-3-deployment      106s
+openshift   s2i-dotnet-3-deployment-pr   105s
+openshift   s2i-dotnet-3-knative         106s
+openshift   s2i-dotnet-3-knative-pr      105s
+openshift   s2i-dotnet-3-pr              105s
+openshift   s2i-go                       107s
 ...
 ```
 
@@ -430,7 +432,7 @@ build-and-deploy-run-z2rz8   40 seconds ago   ---          Running
 ```
 
 
-Check out the logs of the pipelinerun as it runs using the `tkn pipeline logs` command which interactively allows you to pick the pipelinerun of your interest and inspect the logs:
+You can optionally check out the logs of the pipelinerun as it runs using the `tkn pipeline logs` command which interactively allows you to pick the pipelinerun of your interest and inspect the logs (**note: allow this command to run until the pipeline completes, as terminating can disrupt the pipeline**):
 
 ```
 $ tkn pipeline logs -f
